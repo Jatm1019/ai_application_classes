@@ -6,9 +6,9 @@ import image_class
 app = FastAPI()
 
 # ImageNetのクラスラベルを読み込む
-imagenet_classes = []
-with open("imagenet_classes.txt", "r") as f:
-    imagenet_classes = [line.strip() for line in f.readlines()]
+imagenet_classes = ['dog','horse','elephant','butterfly','chicken','cat','cattle','sheep','spider','squirrel']
+#with open("imagenet_classes.txt", "r") as f:
+#    imagenet_classes = [line.strip() for line in f.readlines()]
 
 
 @app.get("/")
@@ -28,7 +28,6 @@ async def predict(file: UploadFile = File(...)):
     try:
         image = Image.open(io.BytesIO(await file.read()))
         output = image_class.prediction_image(image)
-        print(output)
         predicted_class = output.argmax().item()
         predicted_label = imagenet_classes[predicted_class]  # ← ラベル名を取得
 

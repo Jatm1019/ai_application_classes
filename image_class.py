@@ -1,18 +1,11 @@
 from torchvision import models, transforms
 import torch
-import customize
-
-# import mlflow
-# import mlflow.sklearn
-# from sklearn.metrics import accuracy_score
-
-# MLflowの設定
-# mlflow.set_tracking_uri("http://localhost:5000")
-# mlflow.set_experiment("image_classification_experiment")
+from customize import CustomResNet18
 
 # 事前学習済みのResNetモデルをロード
-model = customize.CustomResNet18()
-model.eval()
+model = CustomResNet18()
+model.load_state_dict(torch.load("model.pth"))
+model.eval()    # 推論モード
 
 # 画像をモデルが処理できる形に変換する関数
 def preprocess_image(image):
@@ -27,6 +20,5 @@ def preprocess_image(image):
 def prediction_image(image):
     input_tensor = preprocess_image(image) 
     with torch.no_grad():
-        output = model.forward(input_tensor)
-    print(output)
+        output = model(input_tensor)
     return output
