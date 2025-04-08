@@ -28,6 +28,7 @@ async def predict(file: UploadFile = File(...)):
     try:
         image = Image.open(io.BytesIO(await file.read()))
         output = image_class.prediction_image(image)
+        print(output)
         predicted_class = output.argmax().item()
         predicted_label = imagenet_classes[predicted_class]  # ← ラベル名を取得
 
