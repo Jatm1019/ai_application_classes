@@ -3,6 +3,14 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import models, transforms
 from torchvision.datasets import ImageFolder
+import mlflow
+import mlflow.sklearn
+from sklearn.metrics import accuracy_score
+
+# MLflowの設定
+mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.set_experiment("image_classification_experiment")
+
 
 class CustomResNet18(nn.Module):
     def __init__(self):
@@ -121,7 +129,24 @@ if __name__ == "__main__":
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
-    train(model,train_loader,val_loader,criterion,optimizer,num_epochs=1)
+    with mlflow.start_run():
+                # Log parameters
+        mlflow.log_param("batch_size", 32)
+        mlflow.log_param("lr", 0.001)
+        mlflow.log_param("momentum", 0.9)
+        mlflow.log_param("epochs", 1)
+
+        # Train model
+        train(model, train_loader, val_loader, criterion, optimizer, num_epochs=5)
+
+        # Save model
+        torch.save(model.state_dict(), "model.pth")
+
+        # Log model to MLflow
+        mlflow.pytorch.log_model(model, "model")
+
+        # Optionally, log the saved model file
+        mlflow.log_artifact("model.pth")
 
     torch.save(model.state_dict(), "model.pth")
 
